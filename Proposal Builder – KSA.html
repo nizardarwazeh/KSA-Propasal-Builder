@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Proposal Builder – KSA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- SweetAlert2 for styled alerts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  body{font-family:system-ui,Arial,sans-serif;background:#f9fafb;margin:0;padding:40px;color:#222;display:flex;justify-content:center}
+  .wrapper{display:flex;gap:28px;width:95%;max-width:1300px}
+  .container{flex:1.3;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);padding:24px 32px 36px}
+  .results-panel{flex:1.7;background:#f7fafc;border-radius:12px;padding:24px 24px 30px;box-shadow:0 2px 12px rgba(0,0,0,.06);position:sticky;top:40px;height:fit-content}
+  h1{text-align:left;color:#007b83;margin-bottom:10px;font-size:26px;font-weight:700}
+  .top-actions{text-align:right;margin-bottom:20px}
+  .btn{background:#007b83;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+  .btn:hover{background:#006a70}
+  table{width:100%;border-collapse:collapse;margin-bottom:16px}
+  td,th{padding:8px 10px;vertical-align:middle}
+  td:first-child{font-weight:600;width:200px}
+  input,select{width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:14px}
+  input[readonly],input[disabled]{background:#f1f1f1;color:#555;cursor:not-allowed}
+  .inline-input{display:flex;gap:6px;align-items:center}
+  .inline-input input[type="number"]{flex:1}
+  .discount-text{flex:.7;text-align:center;font-weight:600;color:#007b83;font-size:13px;white-space:nowrap}
+  .section-title{background:#e8f4f4;padding:8px;border-radius:8px;margin-top:18px;font-weight:700;color:#006a70}
+  .results-panel h2{color:#007b83;margin-top:0}
+  .results-panel p{font-size:15px;margin:8px 0;line-height:1.4}
+  .results-panel strong{display:inline-block;width:220px;font-weight:600}
+  #totalWithoutVat{display:inline-block;margin-top:4px}
+  .spaced{margin-top:12px;border-top:1px solid #ddd;padding-top:8px}
+  .price-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+  .price-table th{text-align:center;background:#e8f4f4;color:#007b83;padding:6px;border-bottom:1px solid #ddd}
+  .price-table td{text-align:center;padding:6px;border-bottom:1px solid #eee}
+  .price-table td:first-child{text-align:left;font-weight:600;color:#333}
+  .low-total{color:#c0392b;font-weight:700;}
+  .high-total{color:#16a34a;font-weight:700;}
+  #implLine{display:none;}
+  @media(max-width:900px){.wrapper{flex-direction:column}.results-panel{position:relative;top:auto}}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <!-- LEFT -->
+  <div class="container">
+    <h1>Proposal Builder</h1>
+    <div class="top-actions"><button class="btn" id="resetBtn">Reset</button></div>
+    <table>
+      <tr><td>Country</td><td><select id="country" disabled><option>Saudi Arabia</option></select></td></tr>
+      <tr><td>ZenHR Bundle</td><td><select id="bundleZenHR"><option selected>Value</option><option>Advanced</option></select></td></tr>
+      <tr><td>ZenATS Bundle</td><td>
+        <select id="bundleZenATS">
+          <option selected>None</option><option>Starter</option><option>Value</option><option>Advanced</option>
+        </select>
+      </td></tr>
+      <tr><td>No. of Employees</td><td><input id="employees" type="number" min="1" placeholder="Enter employees (min 20)"></td></tr>
+    </table>
+
+    <div class="section-title">Check Your Proposal</div>
+    <table>
+      <tr><td>ZenHR Price (SAR)</td>
+        <td><div class="inline-input"><input id="hrPrice" type="number" step="0.01" disabled><span id="hrDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr><td>ZenPE Price (SAR)</td>
+        <td><div class="inline-input"><input id="pePrice" type="number" step="0.01" disabled><span id="peDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr id="atsRow" style="display:none;"><td>ZenATS Price (SAR)</td>
+        <td><div class="inline-input"><input id="atsPrice" type="number" step="1" disabled><span id="atsDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr><td>PS Fees (SAR)</td>
+        <td><div class="inline-input"><input id="psFees2" type="number" step="1" disabled><span id="psDisc" class="discount-text">00.00%</span></div></td></tr>
+    </table>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="results-panel">
+    <h2>Summary</h2>
+    <p><strong>Monthly Subscription:</strong> <span id="monthlySub">SAR 0.00</span></p>
+    <p><strong>Yearly Subscription:</strong> <span id="yearlySub">SAR 0.00</span></p>
+    <p id="implLine"><strong>Implementation Fees:</strong> <span id="implAmount">SAR 0.00</span></p>
+    <p><strong>VAT Amount:</strong> <span id="vatAmount">SAR 0.00</span></p>
+    <p><strong>Total Amount with VAT:</strong> <span id="totalWithVat">SAR 0.00</span></p>
+    <p class="spaced"><strong>Total Amount without VAT:</strong> <span id="totalWithoutVat">SAR 0.00</span></p>
+
+    <h2 style="margin-top:25px">Price Ranges</h2>
+    <table class="price-table">
+      <thead><tr><th>Feature</th><th>Min</th><th>Max</th></tr></thead>
+      <tbody>
+        <tr><td>ZenHR (PPU)</td><td id="hrMinCell">0.00</td><td id="hrMaxCell">0.00</td></tr>
+        <tr><td>ZenPE (PPU)</td><td id="peMinCell">0.00</td><td id="peMaxCell">0.00</td></tr>
+        <tr><td>ZenATS (Yearly)</td><td id="atsMinCell">0.00</td><td id="atsMaxCell">0.00</td></tr>
+        <tr><td>Implementation</td><td id="implMinCell">0.00</td><td id="implMaxCell">0.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const VAT=15;
+const fmt=n=>(+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const $=id=>document.getElementById(id);
+const inputsLock=locked=>["hrPrice","pePrice","atsPrice","psFees2"].forEach(id=>$(id).disabled=locked);
+
+function clearDiscounts(){
+  ["hrDisc","peDisc","atsDisc","psDisc"].forEach(id=>$(id).textContent="00.00%");
+}
+
+function getZenATSRange(bundle){
+  if(bundle==="Starter")return{min:3750,max:5000};
+  if(bundle==="Value")return{min:11250,max:15000};
+  if(bundle==="Advanced")return{min:22500,max:30000};
+  return{min:0,max:0};
+}
+
+function getImplementationRange(emp,bundle){
+  if(bundle==="Advanced"){
+    if(emp>=20 && emp<=50)return{min:0,max:1500};
+    if(emp>=51 && emp<=100)return{min:0,max:5000};
+    if(emp>=101 && emp<=250)return{min:7500,max:15000};
+    if(emp>=251 && emp<=500)return{min:15000,max:30000};
+    if(emp>=501 && emp<=1000)return{min:20000,max:40000};
+  }else{
+    if(emp>=20 && emp<=50)return{min:0,max:1500};
+    if(emp>=51 && emp<=100)return{min:0,max:5000};
+    if(emp>=101 && emp<=250)return{min:5000,max:10000};
+    if(emp>=251 && emp<=500)return{min:10000,max:20000};
+    if(emp>=501 && emp<=1000)return{min:15000,max:30000};
+  }
+  return{min:0,max:0};
+}
+
+function getRange(bundle,emp){
+  const table={
+    Value:[
+      {minEmp:20,maxEmp:50,hrMin:12.8,peMin:6},
+      {minEmp:51,maxEmp:100,hrMin:12,peMin:4.8},
+      {minEmp:101,maxEmp:250,hrMin:10.8,peMin:4},
+      {minEmp:251,maxEmp:500,hrMin:9.6,peMin:3.4},
+      {minEmp:501,maxEmp:1000,hrMin:8,peMin:3}
+    ],
+    Advanced:[
+      {minEmp:20,maxEmp:50,hrMin:14.4,peMin:6},
+      {minEmp:51,maxEmp:100,hrMin:13.2,peMin:4.8},
+      {minEmp:101,maxEmp:250,hrMin:12,peMin:4},
+      {minEmp:251,maxEmp:500,hrMin:10.8,peMin:3.4},
+      {minEmp:501,maxEmp:1000,hrMin:9.6,peMin:3}
+    ]
+  };
+  return(table[bundle]||[]).find(r=>emp>=r.minEmp&&emp<=r.maxEmp)||null;
+}
+
+function showValidation(id,label,min){
+  Swal.fire({
+    title: 'Invalid Value',
+    html: `<b>${label}</b> must be at least <b style="color:#007b83">SAR ${fmt(min)}</b>.`,
+    icon: 'warning',
+    confirmButtonText: 'Got it',
+    confirmButtonColor: '#007b83',
+  }).then(()=>{ $(id).value=""; $(id).focus(); });
+}
+
+function updateDiscounts(){
+  const emp=+$("employees").value||0;
+  const bundleHR=$("bundleZenHR").value;
+  const bundleATS=$("bundleZenATS").value;
+  const hr=+$("hrPrice").value||0, pe=+$("pePrice").value||0, ats=+$("atsPrice").value||0, ps=+$("psFees2").value||0;
+  const atsRange=getZenATSRange(bundleATS);
+  const implRange=getImplementationRange(emp,bundleHR);
+  $("hrDisc").textContent=(hr?((1-hr/30)*100).toFixed(2):"00.00")+"%";
+  $("peDisc").textContent=(pe?((1-pe/7.5)*100).toFixed(2):"00.00")+"%";
+  $("atsDisc").textContent=(ats?((1-ats/atsRange.max)*100).toFixed(2):"00.00")+"%";
+  $("psDisc").textContent=(ps?((1-ps/implRange.max)*100).toFixed(2):"00.00")+"%";
+}
+
+function updateRanges(emp,bundleHR,bundleATS){
+  const r=getRange(bundleHR,emp)||{hrMin:0,peMin:0};
+  const a=getZenATSRange(bundleATS);
+  const p=getImplementationRange(emp,bundleHR);
+  $("hrMinCell").textContent=fmt(r.hrMin);
+  $("peMinCell").textContent=fmt(r.peMin);
+  $("atsMinCell").textContent=fmt(a.min);
+  $("implMinCell").textContent=fmt(p.min);
+  $("hrMaxCell").textContent=fmt(r.hrMin*1.25);
+  $("peMaxCell").textContent=fmt(r.peMin*1.25);
+  $("atsMaxCell").textContent=fmt(a.max);
+  $("implMaxCell").textContent=fmt(p.max);
+}
+
+function recalc(){
+  const emp=+$("employees").value||0;
+  const bundleHR=$("bundleZenHR").value,bundleATS=$("bundleZenATS").value;
+  const hr=+$("hrPrice").value||0,pe=+$("pePrice").value||0,ats=+$("atsPrice").value||0,ps=+$("psFees2").value||0;
+  updateRanges(emp,bundleHR,bundleATS);
+  updateDiscounts();
+  const yearlySub=emp*(hr+pe)*12;
+  const monthlySub=yearlySub/12;
+  const taxable=yearlySub+ats+ps;
+  const vatAmt=taxable*(VAT/100);
+  const total=taxable+vatAmt;
+  $("atsRow").style.display=(bundleATS==="None")?"none":"";
+  $("monthlySub").textContent=`SAR ${fmt(monthlySub)}`;
+  $("yearlySub").textContent=`SAR ${fmt(yearlySub)}`;
+  if(ps>0){$("implLine").style.display="block";$("implAmount").textContent=`SAR ${fmt(ps)}`;}else{$("implLine").style.display="none";}
+  $("vatAmount").textContent=`SAR ${fmt(vatAmt)}`;
+  $("totalWithVat").textContent=`SAR ${fmt(total)}`;
+  $("totalWithoutVat").textContent=`SAR ${fmt(taxable)}`;
+  const totalEl=$("totalWithoutVat");
+  totalEl.classList.remove("low-total","high-total");
+  if(taxable<3750){totalEl.classList.add("low-total");}else{totalEl.classList.add("high-total");}
+}
+
+function resetAll(){
+  document.querySelectorAll("input").forEach(i=>i.value="");
+  $("bundleZenHR").value="Value";$("bundleZenATS").value="None";
+  $("atsRow").style.display="none";
+  ["monthlySub","yearlySub","vatAmount","totalWithVat","totalWithoutVat","implAmount"].forEach(id=>$(id).textContent="SAR 0.00");
+  ["hrMinCell","peMinCell","atsMinCell","implMinCell","hrMaxCell","peMaxCell","atsMaxCell","implMaxCell"].forEach(id=>$(id).textContent="0.00");
+  $("implLine").style.display="none";
+  clearDiscounts();
+  inputsLock(true);
+  $("employees").focus();
+}
+
+// instantly unlock fields when typing directly
+["hrPrice","pePrice","atsPrice","psFees2"].forEach(id=>{
+  $(id).addEventListener("keydown",()=>inputsLock(false),{once:true});
+});
+
+$("employees").addEventListener("blur",()=>{
+  const emp=+$("employees").value;
+  if(emp && emp<20){
+    Swal.fire({
+      title:'Invalid Input',
+      html:'Minimum number of employees is <b style="color:#007b83">20</b>.',
+      icon:'warning',
+      confirmButtonText:'OK',
+      confirmButtonColor:'#007b83'
+    }).then(()=>{$("employees").value="";$("employees").focus();});
+    return;
+  }
+  inputsLock(emp<20);
+  clearDiscounts();
+  if(emp>=20){$("hrPrice").focus();}
+  recalc();
+});
+
+// Hide or show ATS field dynamically
+$("bundleZenATS").addEventListener("change",()=>{
+  const bundle=$("bundleZenATS").value;
+  $("atsRow").style.display=(bundle==="None")?"none":"";
+  clearDiscounts();
+  recalc();
+});
+
+["bundleZenHR"].forEach(id=>{
+  $(id).addEventListener("change",()=>{
+    clearDiscounts();
+    resetAll();
+  });
+});
+
+["hrPrice","pePrice","atsPrice","psFees2"].forEach(id=>$(id).addEventListener("input",recalc));
+
+$("hrPrice").addEventListener("blur",()=>{const emp=+$("employees").value;if(!emp)return;const r=getRange($("bundleZenHR").value,emp);if(!r)return;
+const v=+$("hrPrice").value;if(!v)return;if(v<r.hrMin){showValidation("hrPrice","ZenHR Price",r.hrMin);}recalc();});
+$("pePrice").addEventListener("blur",()=>{const emp=+$("employees").value;if(!emp)return;const r=getRange($("bundleZenHR").value,emp);if(!r)return;
+const v=+$("pePrice").value;if(!v)return;if(v<r.peMin){showValidation("pePrice","ZenPE Price",r.peMin);}recalc();});
+$("atsPrice").addEventListener("blur",()=>{const bundle=$("bundleZenATS").value;if(bundle==="None")return;const a=getZenATSRange(bundle);
+const v=+$("atsPrice").value;if(!v)return;if(v<a.min){showValidation("atsPrice","ZenATS Price",a.min);}recalc();});
+$("psFees2").addEventListener("blur",()=>{const emp=+$("employees").value;if(!emp)return;const p=getImplementationRange(emp,$("bundleZenHR").value);
+const v=+$("psFees2").value;if(!v)return;if(v<p.min){showValidation("psFees2","Implementation / PS Fees",p.min);}recalc();});
+
+$("resetBtn").addEventListener("click",resetAll);
+resetAll();
+</script>
+</body>
+</html>
