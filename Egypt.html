@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Proposal Builder – Egypt</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">document.getElementById("changeCountryBtn").onclick=function(){window.location="index.html";};
+</script>
+<style>
+  body{font-family:system-ui,Arial,sans-serif;background:#f9fafb;margin:0;padding:40px;color:#222;display:flex;justify-content:center}
+  .wrapper{display:flex;gap:28px;width:95%;max-width:1300px}
+  .container{flex:1.3;background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.06);padding:24px 32px 36px}
+  .results-panel{flex:1.7;background:#f7fafc;border-radius:12px;padding:24px 24px 30px;box-shadow:0 2px 12px rgba(0,0,0,.06);position:sticky;top:40px;height:fit-content}
+  h1{text-align:left;color:#007b83;margin-bottom:10px;font-size:26px;font-weight:700}
+  .top-actions{text-align:right;margin-bottom:20px}
+  .btn{background:#007b83;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:14px}
+  .btn:hover{background:#006a70}
+  table{width:100%;border-collapse:collapse;margin-bottom:16px}
+  td,th{padding:8px 10px;vertical-align:middle}
+  td:first-child{font-weight:600;width:200px}
+  input,select{width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:14px}
+  input[readonly],input[disabled]{background:#f1f1f1;color:#555;cursor:not-allowed}
+  .inline-input{display:flex;gap:6px;align-items:center}
+  .inline-input input[type="number"]{flex:1}
+  .discount-text{flex:.7;text-align:center;font-weight:600;color:#007b83;font-size:13px;white-space:nowrap}
+  .section-title{background:#e8f4f4;padding:8px;border-radius:8px;margin-top:18px;font-weight:700;color:#006a70}
+  .results-panel h2{color:#007b83;margin-top:0}
+  .results-panel p{font-size:15px;margin:8px 0;line-height:1.4}
+  .results-panel strong{display:inline-block;width:220px;font-weight:600}
+  .spaced{margin-top:12px;border-top:1px solid #ddd;padding-top:8px}
+  .price-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+  .price-table th{text-align:center;background:#e8f4f4;color:#007b83;padding:6px;border-bottom:1px solid #ddd}
+  .price-table td{text-align:center;padding:6px;border-bottom:1px solid #eee}
+  .price-table td:first-child{text-align:left;font-weight:600;color:#333}
+  .low-total{color:#c0392b;font-weight:700;}
+  .high-total{color:#16a34a;font-weight:700;}
+  #implLine{display:none;}
+  #atsYearlyLine{display:none;}
+  @media(max-width:900px){.wrapper{flex-direction:column}.results-panel{position:relative;top:auto}}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+  <!-- LEFT -->
+  <div class="container">
+    <h1>Proposal Builder</h1>
+    <div class="top-actions"><button class="btn" id="resetBtn">Reset</button> <button class="btn" id="changeCountryBtn">Change Country</button> </div>
+    <table>
+      <tr><td>Country</td><td><select id="country" disabled><option>Egypt</option></select></td></tr>
+      <tr><td>ZenHR Bundle</td><td><select id="bundleZenHR"><option selected>Value</option><option>Advanced</option></select></td></tr>
+      <tr><td>ZenATS Bundle</td><td>
+        <select id="bundleZenATS">
+          <option selected>None</option><option>Starter</option><option>Value</option><option>Advanced</option>
+        </select>
+      </td></tr>
+      <tr><td>No. of Employees</td><td><input id="employees" type="number" min="1" placeholder="Enter employees (min 20)"></td></tr>
+    </table>
+
+    <div class="section-title">Check Your Proposal</div>
+    <table>
+      <tr><td>ZenHR Price (USD)</td>
+        <td><div class="inline-input"><input id="hrPrice" type="number" step="0.01" disabled><span id="hrDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr><td>ZenPE Price (USD)</td>
+        <td><div class="inline-input"><input id="pePrice" type="number" step="0.01" disabled><span id="peDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr id="atsRow"><td>ZenATS Price (USD)</td>
+        <td><div class="inline-input"><input id="atsPrice" type="number" step="1" disabled><span id="atsDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr><td>PS Fees (USD)</td>
+        <td><div class="inline-input"><input id="psFees2" type="number" step="1" disabled><span id="psDisc" class="discount-text">00.00%</span></div></td></tr>
+    </table>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="results-panel">
+    <h2>Summary</h2>
+    <p><strong>Monthly Subscription:</strong> <span id="monthlySub">USD 0.00</span></p>
+    <p><strong>Yearly Subscription:</strong> <span id="yearlySub">USD 0.00</span></p>
+    <p id="atsYearlyLine"><strong>ZenATS Yearly:</strong> <span id="atsYearlyAmount">USD 0.00</span></p>
+    <p id="implLine"><strong>Implementation Fees:</strong> <span id="implAmount">USD 0.00</span></p>
+    <p class="spaced"><strong>Total Amount:</strong> <span id="totalWithoutVat">USD 0.00</span></p>
+
+    <h2 style="margin-top:25px">Price Ranges</h2>
+    <table class="price-table">
+      <thead><tr><th>Feature</th><th>Min</th><th>Max</th></tr></thead>
+      <tbody>
+        <tr><td>ZenHR (PPU)</td><td id="hrMinCell">0.00</td><td id="hrMaxCell">0.00</td></tr>
+        <tr><td>ZenPE (PPU)</td><td id="peMinCell">0.00</td><td id="peMaxCell">0.00</td></tr>
+        <tr><td>ZenATS (Yearly)</td><td id="atsMinCell">0.00</td><td id="atsMaxCell">0.00</td></tr>
+        <tr><td>Implementation</td><td id="implMinCell">0.00</td><td id="implMaxCell">0.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+/* ===== Pricing Logic for Egypt Proposal Builder (USD) ===== */
+
+const rangeData = {
+  "Value": [
+    { range: "20-50",   hrMin: 2.13, hrMax: 2.50, peMin: 1.70,  peMax: 2.50 },
+    { range: "51-100",  hrMin: 1.91, hrMax: 2.25, peMin: 1.49,  peMax: 1.75 },
+    { range: "101-250", hrMin: 1.70, hrMax: 2.5,  peMin: 1.28,  peMax: 1.50 },
+    { range: "251-500", hrMin: 1.49, hrMax: 1.75, peMin: 1.06,  peMax: 1.25 },
+    { range: "501-1000",hrMin: 1.28, hrMax: 1.50, peMin: 0.85,  peMax: 1.00 }
+  ],
+  "Advanced": [
+    { range: "20-50",   hrMin: 2.55, hrMax: 3.00, peMin: 1.70,  peMax: 2.0 },
+    { range: "51-100",  hrMin: 2.34, hrMax: 2.75, peMin: 1.49,  peMax: 1.75 },
+    { range: "101-250", hrMin: 2.13, hrMax: 2.50, peMin: 1.28,  peMax: 1.50 },
+    { range: "251-500", hrMin: 1.91, hrMax: 2.25, peMin: 1.06,  peMax: 1.25 },
+    { range: "501-1000",hrMin: 1.70, hrMax: 2.00, peMin: 0.85,  peMax: 1.00 }
+  ]
+};
+
+const atsPricing = {
+  "None":      { min: 0,     max: 0 },
+  "Starter":   { min: 1000,  max: 1333.33 },
+  "Value":     { min: 3000,  max: 4000 },
+  "Advanced":  { min: 6000,  max: 8000 }
+};
+
+const implementationFees = {
+  "Value": [
+    { range: "20-50",   min: 0,     max: 500 },
+    { range: "51-100",  min: 0,     max: 1000 },
+    { range: "101-250", min: 1000,  max: 2000 },
+    { range: "251-500", min: 2000, max: 4000 },
+    { range: "501-1000",min: 3000, max: 6000 }
+  ],
+  "Advanced": [
+    { range: "20-50",   min: 0,     max: 500 },
+    { range: "51-100",  min: 0,     max: 1000 },
+    { range: "101-250", min: 1500,  max: 3000 },
+    { range: "251-500", min: 3000, max: 6000 },
+    { range: "501-1000",min: 4000, max: 8000 }
+  ]
+};
+
+const fmt=n=>(+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const $=id=>document.getElementById(id);
+const inputsLock=locked=>["hrPrice","pePrice","atsPrice","psFees2"].forEach(id=>$(id).disabled=locked);
+
+function clearDiscounts(){["hrDisc","peDisc","atsDisc","psDisc"].forEach(id=>$(id).textContent="00.00%");}
+
+function getRange(bundle,e){const d=rangeData[bundle]||[];return d.find(r=>{const[a,b]=r.range.split("-").map(Number);return e>=a&&e<=b;})||null;}
+function getZenATSRange(b){return atsPricing[b]||{min:0,max:0};}
+function getImplementationRange(e,b){const d=implementationFees[b]||[];return d.find(r=>{const[a,b]=r.range.split("-").map(Number);return e>=a&&e<=b;})||{min:0,max:0};}
+
+function showValidation(id,l,m){Swal.fire({title:'Invalid Value',html:`<b>${l}</b> must be at least <b style="color:#007b83">USD ${fmt(m)}</b>.`,icon:'warning',confirmButtonText:'Got it',confirmButtonColor:'#007b83'}).then(()=>{$(id).value="";$("id").focus();});}
+
+function updateDiscounts(){
+const e=+$("employees").value||0,bh=$("bundleZenHR").value,ba=$("bundleZenATS").value;
+const hr=+$("hrPrice").value||0,pe=+$("pePrice").value||0,ats=+$("atsPrice").value||0,ps=+$("psFees2").value||0;
+const a=getZenATSRange(ba),p=getImplementationRange(e,bh);
+$("hrDisc").textContent=(hr?((1-hr/4)*100).toFixed(2):"00.00")+"%";
+$("peDisc").textContent=(pe?((1-pe/3)*100).toFixed(2):"00.00")+"%";
+$("atsDisc").textContent=(ats?((1-ats/a.max)*100).toFixed(2):"00.00")+"%";
+$("psDisc").textContent=(ps?((1-ps/p.max)*100).toFixed(2):"00.00")+"%";
+}
+
+function updateRanges(e,bh,ba){
+const r=getRange(bh,e)||{hrMin:0,hrMax:0,peMin:0,peMax:0},a=getZenATSRange(ba),p=getImplementationRange(e,bh);
+$("hrMinCell").textContent=fmt(r.hrMin);$("hrMaxCell").textContent=fmt(r.hrMax);
+$("peMinCell").textContent=fmt(r.peMin);$("peMaxCell").textContent=fmt(r.peMax);
+$("atsMinCell").textContent=fmt(a.min);$("atsMaxCell").textContent=fmt(a.max);
+$("implMinCell").textContent=fmt(p.min);$("implMaxCell").textContent=fmt(p.max);
+}
+
+function recalc(){
+const e=+$("employees").value||0,bh=$("bundleZenHR").value,ba=$("bundleZenATS").value;
+const hr=+$("hrPrice").value||0,pe=+$("pePrice").value||0,ats=+$("atsPrice").value||0,ps=+$("psFees2").value||0;
+updateRanges(e,bh,ba);updateDiscounts();
+const y=e*(hr+pe)*12,m=y/12,total=y+ats+ps;
+$("atsRow").style.display=(ba==="None")?"none":"";
+$("monthlySub").textContent=`USD ${fmt(m)}`;$("yearlySub").textContent=`USD ${fmt(y)}`;
+if(ba!=="None" && ats>0){$("atsYearlyLine").style.display="block";$("atsYearlyAmount").textContent=`USD ${fmt(ats)}`;}else{$("atsYearlyLine").style.display="none";}
+if(ps>0){$("implLine").style.display="block";$("implAmount").textContent=`USD ${fmt(ps)}`}else{$("implLine").style.display="none";}
+$("totalWithoutVat").textContent=`USD ${fmt(total)}`;
+const el=$("totalWithoutVat");el.classList.remove("low-total","high-total");if(total<1000){el.classList.add("low-total");}else{el.classList.add("high-total");}
+}
+
+function resetAll(){
+document.querySelectorAll("input").forEach(i=>i.value="");
+$("bundleZenHR").value="Value";$("bundleZenATS").value="None";$("atsRow").style.display="none";
+["monthlySub","yearlySub","atsYearlyAmount","totalWithoutVat","implAmount"].forEach(id=>$(id).textContent="USD 0.00");
+["hrMinCell","peMinCell","atsMinCell","implMinCell","hrMaxCell","peMaxCell","atsMaxCell","implMaxCell"].forEach(id=>$(id).textContent="0.00");
+$("implLine").style.display="none";$("atsYearlyLine").style.display="none";clearDiscounts();inputsLock(true);$("employees").focus();
+}
+
+/* ===== Event Listeners ===== */
+$("employees").addEventListener("input",()=>{const e=+$("employees").value;if(e>=20){inputsLock(false);}else{inputsLock(true);}clearDiscounts();recalc();});
+$("employees").addEventListener("blur",()=>{const e=+$("employees").value;if(e&&e<20){Swal.fire({title:'Invalid Input',html:'Minimum number of employees is <b style="color:#007b83">20</b>.',icon:'warning',confirmButtonText:'OK',confirmButtonColor:'#007b83'}).then(()=>{$("employees").value="";$("employees").focus();});return;}if(e>=20){$("hrPrice").focus();}recalc();});
+["bundleZenHR","bundleZenATS","employees"].forEach(id=>$(id).addEventListener("change",()=>{const monthly=$("monthlySub").textContent.trim();if(!monthly.includes("USD 0.00")){resetAll();}else{recalc();}}));
+["hrPrice","pePrice","atsPrice","psFees2"].forEach(id=>$(id).addEventListener("input",recalc));
+$("hrPrice").addEventListener("blur",()=>{const e=+$("employees").value;if(!e)return;const r=getRange($("bundleZenHR").value,e);if(!r)return;const v=+$("hrPrice").value;if(!v)return;if(v<r.hrMin){showValidation("hrPrice","ZenHR Price",r.hrMin);}recalc();});
+$("pePrice").addEventListener("blur",()=>{const e=+$("employees").value;if(!e)return;const r=getRange($("bundleZenHR").value,e);if(!r)return;const v=+$("pePrice").value;if(!v)return;if(v<r.peMin){showValidation("pePrice","ZenPE Price",r.peMin);}recalc();});
+$("atsPrice").addEventListener("blur",()=>{const b=$("bundleZenATS").value;if(b==="None")return;const a=getZenATSRange(b);const v=+$("atsPrice").value;if(!v)return;if(v<a.min){showValidation("atsPrice","ZenATS Price",a.min);}recalc();});
+$("psFees2").addEventListener("blur",()=>{const e=+$("employees").value;if(!e)return;const p=getImplementationRange(e,$("bundleZenHR").value);const v=+$("psFees2").value;if(!v)return;if(v<p.min){Swal.fire({title:'Invalid Value',html:`<b>Implementation / PS Fees</b> must be at least <b style="color:#007b83">USD ${fmt(p.min)}</b>.`,icon:'warning',confirmButtonText:'Got it',confirmButtonColor:'#007b83'}).then(()=>{$("psFees2").value="";$("psFees2").focus();});}else{recalc();}});
+$("resetBtn").addEventListener("click",resetAll);
+resetAll();
+document.getElementById("changeCountryBtn").onclick=function(){window.location="index.html";};
+</script>
+</body>
+</html>
