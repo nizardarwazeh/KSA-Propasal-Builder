@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <title>Select Country</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
   body {
     font-family: system-ui, Arial;
@@ -16,17 +15,16 @@
     align-items: center;
   }
 
-  /* Fade-in animation */
   .fade-in {
     animation: fadeIn 0.7s ease-out forwards;
     opacity: 0;
   }
+
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Center box */
   .box {
     background: #fff;
     padding: 40px 50px;
@@ -43,7 +41,7 @@
     font-weight: 700;
   }
 
-  select, button {
+  select {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
@@ -51,19 +49,7 @@
     font-size: 16px;
   }
 
-  button {
-    background: #007b83;
-    color: #fff;
-    cursor: pointer;
-    margin-top: 18px;
-    font-weight: 600;
-  }
-
-  button:hover {
-    background: #006a70;
-  }
-
-  /* Loader overlay */
+  /* Loader Overlay */
   #loaderOverlay {
     position: fixed;
     inset: 0;
@@ -74,7 +60,6 @@
     z-index: 9999;
   }
 
-  /* Spinner */
   .spinner {
     width: 60px;
     height: 60px;
@@ -88,16 +73,11 @@
     to { transform: rotate(360deg); }
   }
 </style>
-
 </head>
+
 <body>
+<div id="loaderOverlay"><div class="spinner"></div></div>
 
-<!-- Loader -->
-<div id="loaderOverlay">
-  <div class="spinner"></div>
-</div>
-
-<!-- Center box -->
 <div class="box fade-in">
   <h1>Select Country</h1>
 
@@ -112,23 +92,19 @@
     <option value="Egypt.html">Egypt</option>
     <option value="Bahrain.html">Bahrain</option>
   </select>
-
-  <button onclick="go()">Continue</button>
 </div>
 
 <script>
-function go() {
-  const file = document.getElementById('countrySelect').value;
+document.getElementById('countrySelect').addEventListener('change', function() {
+  const file = this.value;
   if (!file) return;
 
-  // Show loading overlay
   document.getElementById('loaderOverlay').style.display = 'flex';
 
-  // Redirect after short delay for animation
   setTimeout(() => {
     window.location.href = file;
   }, 600);
-}
+});
 </script>
 
 </body>
