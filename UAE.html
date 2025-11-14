@@ -120,6 +120,12 @@ $("psDisc").textContent=(ps?((1-ps/p.max)*100).toFixed(2):"00.00")+"%";
 }
 
 function updateRanges(e,bh,ba){
+  if (!e || e < 20) {
+    ["hrMinCell","hrMaxCell","peMinCell","peMaxCell","atsMinCell","atsMaxCell","implMinCell","implMaxCell"].forEach(id=>{
+      document.getElementById(id).textContent="0.00";
+    });
+    return;
+  }
 const r=getRange(bh,e)||{hrMin:0,peMin:0},a=getZenATSRange(ba),p=getImplementationRange(e,bh);
 $("hrMinCell").textContent=fmt(r.hrMin);$("peMinCell").textContent=fmt(r.peMin);
 $("atsMinCell").textContent=fmt(a.min);$("implMinCell").textContent=fmt(p.min);
@@ -138,8 +144,18 @@ if(ps>0){$("implLine").style.display="block";$("implAmount").textContent=`AED ${
 $("vatAmount").textContent=`AED ${fmt(vat)}`;$("totalWithVat").textContent=`AED ${fmt(total)}`;
 $("totalWithoutVat").textContent=`AED ${fmt(tax)}`;
 const el=$("totalWithoutVat");el.classList.remove("low-total","high-total");if(tax<3750){el.classList.add("low-total");}else{el.classList.add("high-total");}
-}
 
+  // NEW: If all proposal fields are empty, reset summary
+  if (!hr && !pe && !ats && !ps) {
+      document.getElementById("monthlySub").textContent = "AED 0.00";
+      document.getElementById("yearlySub").textContent = "AED 0.00";
+      document.getElementById("implAmount").textContent = "AED 0.00";
+      document.getElementById("vatAmount").textContent = "AED 0.00";
+      document.getElementById("totalWithVat").textContent = "AED 0.00";
+      document.getElementById("totalWithoutVat").textContent = "AED 0.00";
+  }
+
+}
 function resetAll(){
 document.querySelectorAll("input").forEach(i=>i.value="");
 $("bundleZenHR").value="Value";$("bundleZenATS").value="None";$("atsRow").style.display="none";
