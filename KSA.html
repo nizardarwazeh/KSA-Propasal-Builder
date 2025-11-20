@@ -23,7 +23,7 @@
   input,select{width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:14px}
   input[readonly],input[disabled]{background:#f1f1f1;color:#555;cursor:not-allowed}
   .inline-input{display:flex;gap:6px;align-items:center}
-  .inline-input input[type="number"]{flex:1}
+  .inline-input input[type="text"]{flex:1}
   .discount-text{flex:.7;text-align:center;font-weight:600;color:#007b83;font-size:13px;white-space:nowrap}
   .section-title{background:#e8f4f4;padding:8px;border-radius:8px;margin-top:18px;font-weight:700;color:#006a70}
   .results-panel h2{color:#007b83;margin-top:0}
@@ -50,14 +50,12 @@
     <h1>Proposal Builder</h1>
 
     <div class="top-actions">
-      <button class="btn" id="resetBtn">Reset</button>
-      <button class="btn" id="changeCountryBtn">Change Country</button>
-    </div>
+      <button class="btn" id="resetBtn">Reset</button></div>
 
     <table>
       <tr>
         <td>Country</td>
-        <td><select id="country" disabled><option>Saudi Arabia</option></select></td>
+        <td><select id="country"><option selected>Saudi Arabia</option><option>UAE</option><option>Qatar</option><option>Bahrain</option><option>Kuwait</option><option>Oman</option><option>Jordan</option><option>Iraq</option><option>Egypt</option></select></td>
       </tr>
 
       <tr>
@@ -84,7 +82,7 @@
 
       <tr>
         <td>No. of Employees</td>
-        <td><input id="employees" type="number" min="1" placeholder="Enter employees (min 20)"></td>
+        <td><input id="employees" type="text" min="1" placeholder="Enter employees (min 20)"></td>
       </tr>
     </table>
 
@@ -95,9 +93,8 @@
         <td>ZenHR Price (SAR)</td>
         <td>
           <div class="inline-input">
-            <input id="hrPrice" type="number" step="0.01" disabled>
-            <span id="hrDisc" class="discount-text">00.00%</span>
-          </div>
+            <input id="hrPrice" type="text" step="0.01" disabled>
+            <span id="hrDisc" class="discount-text">00.00%</span></div>
         </td>
       </tr>
 
@@ -105,9 +102,8 @@
         <td>ZenPE Price (SAR)</td>
         <td>
           <div class="inline-input">
-            <input id="pePrice" type="number" step="0.01" disabled>
-            <span id="peDisc" class="discount-text">00.00%</span>
-          </div>
+            <input id="pePrice" type="text" step="0.01" disabled>
+            <span id="peDisc" class="discount-text">00.00%</span></div>
         </td>
       </tr>
 
@@ -115,9 +111,8 @@
         <td>ZenATS Price (SAR)</td>
         <td>
           <div class="inline-input">
-            <input id="atsPrice" type="number" step="1" disabled>
-            <span id="atsDisc" class="discount-text">00.00%</span>
-          </div>
+            <input id="atsPrice" type="text" step="1" disabled>
+            <span id="atsDisc" class="discount-text">00.00%</span></div>
         </td>
       </tr>
 
@@ -125,17 +120,16 @@
         <td>PS Fees (SAR)</td>
         <td>
           <div class="inline-input">
-            <input id="psFees2" type="number" step="1" disabled>
-            <span id="psDisc" class="discount-text">00.00%</span>
-          </div>
+            <input id="psFees2" type="text" step="1" disabled>
+            <span id="psDisc" class="discount-text">00.00%</span></div>
         </td>
       </tr>
-    </table>
-  </div>
+    </table></div>
 
   <!-- RIGHT SIDE -->
   <div class="results-panel">
     <h2>Summary</h2>
+<img src="https://nizardarwazeh.github.io/Propasal-Builder/KSA.png" style="width:130px;float:right;margin-top:-55px;margin-right:8px;opacity:0.82;">
     <p><strong>Monthly Subscription:</strong> <span id="monthlySub">SAR 0.00</span></p>
     <p><strong>Yearly Subscription:</strong> <span id="yearlySub">SAR 0.00</span></p>
     <p id="implLine"><strong>Implementation Fees:</strong> <span id="implAmount">SAR 0.00</span></p>
@@ -160,10 +154,7 @@
         <tr><td>ZenATS (Yearly)</td><td id="atsMinCell">0.00</td><td id="atsMaxCell">0.00</td></tr>
         <tr><td>Implementation</td><td id="implMinCell">0.00</td><td id="implMaxCell">0.00</td></tr>
       </tbody>
-    </table>
-  </div>
-
-</div><script>
+    </table></div></div><script>
 const VAT = 15;
 const fmt = n => (+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 const $ = id => document.getElementById(id);
@@ -235,8 +226,8 @@ function updateDiscounts(){
 
   const hr = +$("hrPrice").value || 0;
   const pe = +$("pePrice").value || 0;
-  const ats = +$("atsPrice").value || 0;
-  const ps = +$("psFees2").value || 0;
+  const ats = Number($("atsPrice").value.replace(/,/g,"")) || 0;
+  const ps = Number($("psFees2").value.replace(/,/g,"")) || 0;
 
   const a = getZenATSRange(ba);
   const p = getImplementationRange(e,bh);
@@ -282,8 +273,8 @@ function recalc(){
 
   const hr  = +$("hrPrice").value || 0;
   const pe  = +$("pePrice").value || 0;
-  const ats = +$("atsPrice").value || 0;
-  const ps  = +$("psFees2").value || 0;
+  const ats = Number($("atsPrice").value.replace(/,/g,"")) || 0;
+  const ps = Number($("psFees2").value.replace(/,/g,"")) || 0;
 
   updateRanges(e,bh,ba);
   updateDiscounts();
@@ -304,12 +295,7 @@ function recalc(){
   $("totalWithVat").textContent = `SAR ${fmt(total)}`;
   $("totalWithoutVat").textContent = `SAR ${fmt(taxBase)}`;
 
-  if(ps > 0){
-    $("implLine").style.display = "block";
-    $("implAmount").textContent = `SAR ${fmt(ps)}`;
-  } else {
-    $("implLine").style.display = "none";
-  }
+  if(ps > 0){ $("implLine").style.display="block"; $("implAmount").textContent=`SAR ${fmt(ps)}`; } else { $("implLine").style.display="none"; }
 
     // ATS summary line
   if(ba !== "None" && ats > 0){
@@ -349,24 +335,7 @@ function resetProposalFields(){
 // =====================
 // FULL RESET (Reset button only)
 // =====================
-function resetAll(){
-  document.querySelectorAll("input").forEach(i => i.value = "");
-  $("bundleZenHR").value = "Value";
-  $("bundleZenATS").value = "None";
-  $("atsRow").style.display = "none";
-
-  ["monthlySub","yearlySub","vatAmount","totalWithVat","totalWithoutVat","implAmount"]
-    .forEach(id => $(id).textContent = "SAR 0.00");
-
-  ["hrMinCell","peMinCell","atsMinCell","implMinCell","hrMaxCell","peMaxCell","atsMaxCell","implMaxCell"]
-    .forEach(id => $(id).textContent = "0.00");
-
-  $("implLine").style.display = "none";
-
-  clearDiscounts();
-  inputsLock(true);
-  $("employees").focus();
-}
+function resetAll(){ location.reload(); }
 
 // =====================
 // EVENTS
@@ -485,5 +454,103 @@ $("changeCountryBtn").onclick = () => { window.location = "index.html"; };
 // Init
 resetAll();
 </script></script>
+
+<script>
+document.getElementById("country").onchange=function(){
+    const c=this.value;
+    const map={
+        "Saudi Arabia":"KSA.html",
+        "UAE":"UAE.html",
+        "Qatar":"Qatar.html",
+        "Bahrain":"Bahrain.html",
+        "Kuwait":"Kuwait.html",
+        "Oman":"Oman.html",
+        "Jordan":"Jordan.html",
+        "Iraq":"Iraq.html",
+        "Egypt":"Egypt.html"
+    };
+    window.location = map[c];
+};
+</script>
+
+
+<script>
+document.getElementById("employees").addEventListener("blur",function(){
+    const e = +this.value;
+    if(e && e < 20){
+        Swal.fire({
+            title:'Invalid Input',
+            html:'Minimum number of employees is <b style="color:#007b83">20</b>.',
+            icon:'warning',
+            confirmButtonText:'OK',
+            confirmButtonColor:'#007b83'
+        }).then(()=>{ this.value=""; this.focus(); });
+    }
+});
+</script>
+
+
+<script>
+function formatNumInput(el){
+    let v=el.value.replace(/,/g,'');
+    if(!v||isNaN(v)) return;
+    let f=Number(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    el.value=f;
+}
+
+['hrPrice','pePrice','atsPrice','psFees2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('blur',()=>formatNumInput(el));
+});
+</script>
+
+
+<script>
+document.getElementById("bundleZenATS").addEventListener("change", function(){
+    const b = this.value;
+    const atsPrice = document.getElementById("atsPrice");
+    const atsRow = document.getElementById("atsRow");
+    const atsLine = document.getElementById("atsLine");
+
+    atsPrice.value = "";
+    atsRow.style.display = (b === "None") ? "none" : "";
+    atsLine.style.display = (b === "None") ? "none" : "";
+    recalc();
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const b = document.getElementById("bundleZenATS").value;
+    if(b === "None"){
+        document.getElementById("atsRow").style.display = "none";
+        document.getElementById("atsLine").style.display = "none";
+        document.getElementById("atsPrice").value = "";
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener("input", function(){
+    const ps = document.getElementById("psFees2").value.replace(/,/g,'');
+    const impl = document.getElementById("implLine");
+    if(ps && !isNaN(ps) && Number(ps) > 0){
+        impl.style.display = "block";
+    } else {
+        impl.style.display = "none";
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const emp = document.getElementById("employees");
+    if(emp){ emp.focus(); }
+});
+</script>
+
 </body>
 </html>
