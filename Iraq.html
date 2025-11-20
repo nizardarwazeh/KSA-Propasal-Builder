@@ -2,10 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Proposal Builder – Iraq</title>
+<title>Proposal Builder – KSA</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11">document.getElementById("changeCountryBtn").onclick=function(){window.location="index.html";};
-</script>
+
+<!-- SweetAlert2 for styled alerts -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <style>
   body{font-family:system-ui,Arial,sans-serif;background:#f9fafb;margin:0;padding:40px;color:#222;display:flex;justify-content:center}
   .wrapper{display:flex;gap:28px;width:95%;max-width:1300px}
@@ -21,12 +23,13 @@
   input,select{width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:14px}
   input[readonly],input[disabled]{background:#f1f1f1;color:#555;cursor:not-allowed}
   .inline-input{display:flex;gap:6px;align-items:center}
-  .inline-input input[type="number"]{flex:1}
+  .inline-input input[type="text"]{flex:1}
   .discount-text{flex:.7;text-align:center;font-weight:600;color:#007b83;font-size:13px;white-space:nowrap}
   .section-title{background:#e8f4f4;padding:8px;border-radius:8px;margin-top:18px;font-weight:700;color:#006a70}
   .results-panel h2{color:#007b83;margin-top:0}
   .results-panel p{font-size:15px;margin:8px 0;line-height:1.4}
   .results-panel strong{display:inline-block;width:220px;font-weight:600}
+  #totalWithoutVat{display:inline-block;margin-top:4px}
   .spaced{margin-top:12px;border-top:1px solid #ddd;padding-top:8px}
   .price-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
   .price-table th{text-align:center;background:#e8f4f4;color:#007b83;padding:6px;border-bottom:1px solid #ddd}
@@ -35,7 +38,6 @@
   .low-total{color:#c0392b;font-weight:700;}
   .high-total{color:#16a34a;font-weight:700;}
   #implLine{display:none;}
-  #atsYearlyLine{display:none;}
   @media(max-width:900px){.wrapper{flex-direction:column}.results-panel{position:relative;top:auto}}
 </style>
 </head>
@@ -43,15 +45,31 @@
 <body>
 <div class="wrapper">
 
-  <!-- LEFT PANEL -->
+  <!-- LEFT SIDE -->
   <div class="container">
     <h1>Proposal Builder</h1>
-    <div class="top-actions"><button class="btn" id="resetBtn">Reset</button> <button class="btn" id="changeCountryBtn">Change Country</button> </div>
+
+    <div class="top-actions">
+      <button class="btn" id="resetBtn">Reset</button></div>
 
     <table>
-      <tr><td>Country</td><td><select id="country" disabled><option>Iraq</option></select></td></tr>
-      <tr><td>ZenHR Bundle</td><td><select id="bundleZenHR"><option selected>Value</option><option>Advanced</option></select></td></tr>
-      <tr><td>ZenATS Bundle</td>
+      <tr>
+        <td>Country</td>
+        <td><select id="country"><option>Saudi Arabia</option><option>UAE</option><option>Qatar</option><option>Bahrain</option><option selected>Iraq</option><option>Kuwait</option><option>Jordan</option><option>Oman</option><option>Egypt</option></select></td>
+      </tr>
+
+      <tr>
+        <td>ZenHR Bundle</td>
+        <td>
+          <select id="bundleZenHR">
+            <option selected>Value</option>
+            <option>Advanced</option>
+          </select>
+        </td>
+      </tr>
+
+      <tr>
+        <td>ZenATS Bundle</td>
         <td>
           <select id="bundleZenATS">
             <option selected>None</option>
@@ -61,354 +79,487 @@
           </select>
         </td>
       </tr>
-      <tr><td>No. of Employees</td><td><input id="employees" type="number" min="1" placeholder="Enter employees (min 20)"></td></tr>
+
+      <tr>
+        <td>No. of Employees</td>
+        <td><input id="employees" type="text" min="1" placeholder="Enter employees (min 20)"></td>
+      </tr>
     </table>
 
     <div class="section-title">Check Your Proposal</div>
 
     <table>
-      <tr><td>ZenHR Price (USD)</td>
-        <td><div class="inline-input"><input id="hrPrice" type="number" step="0.01" disabled><span id="hrDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr>
+        <td>ZenHR Price (USD)</td>
+        <td>
+          <div class="inline-input">
+            <input id="hrPrice" type="text" step="0.01" disabled>
+            <span id="hrDisc" class="discount-text">00.00%</span></div>
+        </td>
+      </tr>
 
-      <tr><td>ZenPE Price (USD)</td>
-        <td><div class="inline-input"><input id="pePrice" type="number" step="0.01" disabled><span id="peDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr>
+        <td>ZenPE Price (USD)</td>
+        <td>
+          <div class="inline-input">
+            <input id="pePrice" type="text" step="0.01" disabled>
+            <span id="peDisc" class="discount-text">00.00%</span></div>
+        </td>
+      </tr>
 
-      <tr id="atsRow"><td>ZenATS Price (USD)</td>
-        <td><div class="inline-input"><input id="atsPrice" type="number" step="1" disabled><span id="atsDisc" class="discount-text">00.00%</span></div></td></tr>
+      <tr id="atsRow">
+        <td>ZenATS Price (USD)</td>
+        <td>
+          <div class="inline-input">
+            <input id="atsPrice" type="text" step="1" disabled>
+            <span id="atsDisc" class="discount-text">00.00%</span></div>
+        </td>
+      </tr>
 
-      <tr><td>PS Fees (USD)</td>
-        <td><div class="inline-input"><input id="psFees2" type="number" step="1" disabled><span id="psDisc" class="discount-text">00.00%</span></div></td></tr>
-    </table>
-  </div>
+      <tr>
+        <td>PS Fees (USD)</td>
+        <td>
+          <div class="inline-input">
+            <input id="psFees2" type="text" step="1" disabled>
+            <span id="psDisc" class="discount-text">00.00%</span></div>
+        </td>
+      </tr>
+    </table></div>
 
-  <!-- RIGHT PANEL -->
+  <!-- RIGHT SIDE -->
   <div class="results-panel">
     <h2>Summary</h2>
-
+<img src="https://nizardarwazeh.github.io/Propasal-Builder/Iraq.png" style="width:130px;float:right;margin-top:-55px;margin-right:8px;opacity:0.82;">
     <p><strong>Monthly Subscription:</strong> <span id="monthlySub">USD 0.00</span></p>
     <p><strong>Yearly Subscription:</strong> <span id="yearlySub">USD 0.00</span></p>
-
-    <p id="atsYearlyLine"><strong>ZenATS Yearly:</strong> <span id="atsYearlyAmount">USD 0.00</span></p>
     <p id="implLine"><strong>Implementation Fees:</strong> <span id="implAmount">USD 0.00</span></p>
-
+    <p id="atsLine" style="display:none;"><strong>ZenATS Fees:</strong> <span id="atsAmount">USD 0.00</span></p>
+    <p style="display:none;"><strong>VAT Amount:</strong> <span id="vatAmount">USD 0.00</span></p>
+    <p style="display:none;"><strong>Total Amount with VAT:</strong> <span id="totalWithVat">USD 0.00</span></p>
     <p class="spaced"><strong>Total Amount:</strong> <span id="totalWithoutVat">USD 0.00</span></p>
-
-    <!-- JOD FIELD -->
-<p style="display:none;"><strong>Total Amount in JOD:</strong> <span id="totalInJod">JOD 0.00</span></p>
 
     <h2 style="margin-top:25px">Price Ranges</h2>
 
     <table class="price-table">
-      <thead><tr><th>Feature</th><th>Min</th><th>Max</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Min</th>
+          <th>Max</th>
+        </tr>
+      </thead>
       <tbody>
         <tr><td>ZenHR (PPU)</td><td id="hrMinCell">0.00</td><td id="hrMaxCell">0.00</td></tr>
         <tr><td>ZenPE (PPU)</td><td id="peMinCell">0.00</td><td id="peMaxCell">0.00</td></tr>
         <tr><td>ZenATS (Yearly)</td><td id="atsMinCell">0.00</td><td id="atsMaxCell">0.00</td></tr>
         <tr><td>Implementation</td><td id="implMinCell">0.00</td><td id="implMaxCell">0.00</td></tr>
       </tbody>
-    </table>
-  </div>
-</div><script>
-/* ===== UPDATED PRICING LOGIC (Egypt pricing, but UI stays Iraq) ===== */
+    </table></div></div><script>
+const VAT = 0;
+const fmt = n => (+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const $ = id => document.getElementById(id);
 
-// 1️⃣ ZenHR + ZenPE per-employee price ranges
-const rangeData = {
-  "Value": [
-    { range: "20-50",   hrMin: 2.55, hrMax: 3.00, peMin: 1.70,  peMax: 2.00 },
-    { range: "51-100",  hrMin: 2.34, hrMax: 2.75, peMin: 1.49,  peMax: 1.75 },
-    { range: "101-250", hrMin: 2.13, hrMax: 2.50, peMin: 1.28,  peMax: 1.50 },
-    { range: "251-500", hrMin: 1.91, hrMax: 2.50, peMin: 1.06,  peMax: 1.25 },
-    { range: "501-1000",hrMin: 1.70, hrMax: 2.00, peMin: 0.85,  peMax: 1.00 }
-  ],
-  "Advanced": [
-    { range: "20-50",   hrMin: 2.98, hrMax: 3.50, peMin: 1.60,  peMax: 2.00 },
-    { range: "51-100",  hrMin: 2.76, hrMax: 3.25, peMin: 1.28,  peMax: 1.60 },
-    { range: "101-250", hrMin: 2.55, hrMax: 3.00, peMin: 1.07,  peMax: 1.33 },
-    { range: "251-500", hrMin: 2.34, hrMax: 2.75, peMin: 0.91,  peMax: 1.13 },
-    { range: "501-1000",hrMin: 2.13, hrMax: 2.50, peMin: 0.80,  peMax: 1.00 }
-  ]
-};
+// Disable or enable the proposal inputs
+const inputsLock = locked => ["hrPrice","pePrice","atsPrice","psFees2"]
+  .forEach(id => $(id).disabled = locked);
 
-// 2️⃣ ZenATS yearly bundle pricing
-const atsPricing = {
-  "None":      { min: 0,     max: 0 },
-  "Starter":   { min: 1000,  max: 1333.33 },
-  "Value":     { min: 3000,  max: 4000 },
-  "Advanced":  { min: 6000,  max: 8000 }
-};
+// Clear discount labels
+function clearDiscounts() {
+  ["hrDisc","peDisc","atsDisc","psDisc"].forEach(id => $(id).textContent = "00.00%");
+}
 
-// 3️⃣ Implementation / PS Fees
-const implementationFees = {
-  "Value": [
-    { range: "20-50",   min: 0,     max: 500 },
-    { range: "51-100",  min: 0,     max: 1000 },
-    { range: "101-250", min: 1000,  max: 2000 },
-    { range: "251-500", min: 2000,  max: 4000 },
-    { range: "501-1000",min: 3000,  max: 6000 }
-  ],
-  "Advanced": [
-    { range: "20-50",   min: 0,     max: 500 },
-    { range: "51-100",  min: 0,     max: 1500 },
-    { range: "101-250", min: 1500,  max: 3000 },
-    { range: "251-500", min: 3000,  max: 6000 },
-    { range: "501-1000",min: 4000,  max: 8000 }
-  ]
-};
+// =====================
+// GET RANGE FUNCTIONS
+// =====================
 
-const fmt=n=>(+n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-const $=id=>document.getElementById(id);
+function getZenATSRange(b){
+  const t = {
+    "None":      {min:0, max:0},
+    "Starter":   {min:1000,  max:1333.33},
+    "Value":     {min:3000,  max:4000},
+    "Advanced":  {min:6000,  max:8000}
+  };
+  return t[b] || {min:0,max:0};
+}
 
-const inputsLock=locked=>{
-  ["hrPrice","pePrice","atsPrice","psFees2"].forEach(id=>$(id).disabled=locked);
-};
 
-function clearDiscounts(){
-  ["hrDisc","peDisc","atsDisc","psDisc"].forEach(id=>$(id).textContent="00.00%");
+
+function getImplementationRange(e,b){
+  const t = {
+    Value: [
+      {minEmp:20,maxEmp:50,   min:0,       max:400},
+      {minEmp:51,maxEmp:100,  min:0,       max:1000},
+      {minEmp:101,maxEmp:250, min:1000,    max:2000},
+      {minEmp:251,maxEmp:500, min:2000,    max:4000},
+      {minEmp:501,maxEmp:1000,min:3000,    max:6000}
+    ],
+    Advanced: [
+      {minEmp:20,maxEmp:50,   min:0,       max:500},
+      {minEmp:51,maxEmp:100,  min:0,       max:1000},
+      {minEmp:101,maxEmp:250, min:1500,    max:3000},
+      {minEmp:251,maxEmp:500, min:3000,    max:6000},
+      {minEmp:501,maxEmp:1000,min:4000,    max:8000}
+    ]
+  };
+
+  const arr = t[b] || [];
+  return arr.find(r => e >= r.minEmp && e <= r.maxEmp) || {min:0,max:0};
 }
 
 function getRange(bundle,e){
-  const d=rangeData[bundle]||[];
-  return d.find(r=>{
-    const[a,b]=r.range.split("-").map(Number);
-    return e>=a && e<=b;
-  }) || null;
+  const t = {
+    Value: [
+      {minEmp:20,maxEmp:50, hrMin:2.55, hrMax:3.00, peMin:1.70, peMax:2.00},
+      {minEmp:51,maxEmp:100, hrMin:2.34, hrMax:2.75, peMin:1.49, peMax:1.75},
+      {minEmp:101,maxEmp:250, hrMin:2.13, hrMax:2.50, peMin:1.28, peMax:1.50},
+      {minEmp:251,maxEmp:500, hrMin:1.19, hrMax:2.25, peMin:1.06, peMax:1.25},
+      {minEmp:501,maxEmp:1000, hrMin:1.70, hrMax:2.00, peMin:0.85, peMax:1.00}
+    ],
+    Advanced: [
+      {minEmp:20,maxEmp:50, hrMin:2.98, hrMax:3.50, peMin:1.70, peMax:2.00},
+      {minEmp:51,maxEmp:100, hrMin:2.76, hrMax:3.25, peMin:1.49, peMax:1.75},
+      {minEmp:101,maxEmp:250, hrMin:2.55, hrMax:3.00, peMin:1.28, peMax:1.50},
+      {minEmp:251,maxEmp:500, hrMin:2.34, hrMax:2.75, peMin:1.06, peMax:1.25},
+      {minEmp:501,maxEmp:1000, hrMin:2.13, hrMax:2.50, peMin:0.85, peMax:1.00}
+    ]
+  };
+  return (t[bundle] || []).find(r => e >= r.minEmp && e <= r.maxEmp) || null;
 }
 
-function getZenATSRange(b){
-  return atsPricing[b]||{min:0,max:0};
-}
-
-function getImplementationRange(e,b){
-  const d=implementationFees[b]||[];
-  return d.find(r=>{
-    const[a,b]=r.range.split("-").map(Number);
-    return e>=a && e<=b;
-  }) || {min:0,max:0};
-}
-
-function showValidation(id,label,min){
-  Swal.fire({
-    title:'Invalid Value',
-    html:`<b>${label}</b> must be at least <b style="color:#007b83">USD ${fmt(min)}</b>.`,
-    icon:'warning',
-    confirmButtonText:'Got it',
-    confirmButtonColor:'#007b83'
-  }).then(()=>{
-    $(id).value="";
-    $(id).focus();
-  });
-}
-
-function updateDiscounts() {
-  const e = +$("employees").value || 0;
+// =====================
+// UPDATE DISCOUNTS
+// =====================
+function updateDiscounts(){
+  const e = Number($("employees").value.replace(/,/g,"")) || 0;
   const bh = $("bundleZenHR").value;
   const ba = $("bundleZenATS").value;
 
   const hr = +$("hrPrice").value || 0;
   const pe = +$("pePrice").value || 0;
-  const ats = +$("atsPrice").value || 0;
-  const ps = +$("psFees2").value || 0;
+  const ats = Number($("atsPrice").value.replace(/,/g,"")) || 0;
+  const ps = Number($("psFees2").value.replace(/,/g,"")) || 0;
 
-  const a = getZenATSRange(ba);              // ATS min/max
-  const p = getImplementationRange(e, bh);   // PS min/max
+  const a = getZenATSRange(ba);
+  const p = getImplementationRange(e,bh);
 
-  // NEW ORIGINAL PRICES
-  const hrOrig = 4;
-  const peOrig = 3;
-  const atsOrig = a.max;     // original ATS = max of the range
-  const psOrig = p.max;      // original PS = max of the range
-
-  $("hrDisc").textContent = (hr ? ((1 - hr / hrOrig) * 100).toFixed(2) : "00.00") + "%";
-  $("peDisc").textContent = (pe ? ((1 - pe / peOrig) * 100).toFixed(2) : "00.00") + "%";
-  $("atsDisc").textContent = (ats ? ((1 - ats / atsOrig) * 100).toFixed(2) : "00.00") + "%";
-  $("psDisc").textContent  = (ps ? ((1 - ps / psOrig) * 100).toFixed(2) : "00.00") + "%";
+  $("hrDisc").textContent = (hr?((1-hr/4)*100).toFixed(2):"00.00")+"%";
+  $("peDisc").textContent = (pe?((1-pe/3)*100).toFixed(2):"00.00")+"%";
+  $("atsDisc").textContent = (ats?((1-ats/a.max)*100).toFixed(2):"00.00")+"%";
+  $("psDisc").textContent = (ps?((1-ps/p.max)*100).toFixed(2):"00.00")+"%";
 }
 
+// =====================
+// UPDATE RANGE TABLE
+// =====================
 function updateRanges(e,bh,ba){
-  const r=getRange(bh,e) || {hrMin:0,hrMax:0,peMin:0,peMax:0};
-  const ats=getZenATSRange(ba);
-  const impl=getImplementationRange(e,bh);
+  if(!e || e < 20){
+    ["hrMinCell","hrMaxCell","peMinCell","peMaxCell",
+     "atsMinCell","atsMaxCell","implMinCell","implMaxCell"]
+     .forEach(id => $(id).textContent = "0.00");
+    return;
+  }
+  const r = getRange(bh,e) || {hrMin:0,peMin:0};
+  const a = getZenATSRange(ba);
+  const p = getImplementationRange(e,bh);
 
-  $("hrMinCell").textContent=fmt(r.hrMin);
-  $("hrMaxCell").textContent=fmt(r.hrMax);
-  $("peMinCell").textContent=fmt(r.peMin);
-  $("peMaxCell").textContent=fmt(r.peMax);
-  $("atsMinCell").textContent=fmt(ats.min);
-  $("atsMaxCell").textContent=fmt(ats.max);
-  $("implMinCell").textContent=fmt(impl.min);
-  $("implMaxCell").textContent=fmt(impl.max);
+  $("hrMinCell").textContent = fmt(r.hrMin);
+  $("peMinCell").textContent = fmt(r.peMin);
+  $("atsMinCell").textContent = fmt(a.min);
+  $("implMinCell").textContent = fmt(p.min);
+
+  $("hrMaxCell").textContent = fmt(r.hrMin*1.25);
+  $("peMaxCell").textContent = fmt(r.peMin*1.25);
+  $("atsMaxCell").textContent = fmt(a.max);
+  $("implMaxCell").textContent = fmt(p.max);
 }
 
+// =====================
+// RECALCULATE SUMMARY
+// =====================
 function recalc(){
-  const e=+$("employees").value||0;
-  const bh=$("bundleZenHR").value;
-  const ba=$("bundleZenATS").value;
+  const e = Number($("employees").value.replace(/,/g,"")) || 0;
+  const bh = $("bundleZenHR").value;
+  const ba = $("bundleZenATS").value;
 
-  const hr=+$("hrPrice").value||0;
-  const pe=+$("pePrice").value||0;
-  const ats=+$("atsPrice").value||0;
-  const ps=+$("psFees2").value||0;
+  const hr  = +$("hrPrice").value || 0;
+  const pe  = +$("pePrice").value || 0;
+  const ats = Number($("atsPrice").value.replace(/,/g,"")) || 0;
+  const ps = Number($("psFees2").value.replace(/,/g,"")) || 0;
 
   updateRanges(e,bh,ba);
   updateDiscounts();
 
-  const yearly=e*(hr+pe)*12;
-  const monthly=yearly/12;
-  const total=yearly+ats+ps;
+  // Show/Hide ATS row
+  $("atsRow").style.display = (ba === "None") ? "none" : "";
 
-  $("monthlySub").textContent=`USD ${fmt(monthly)}`;
-  $("yearlySub").textContent=`USD ${fmt(yearly)}`;
+  const yearly = e * (hr + pe) * 12;
+  const monthly = yearly / 12;
 
-  if(ba!=="None" && ats>0){
-    $("atsYearlyLine").style.display="block";
-    $("atsYearlyAmount").textContent=`USD ${fmt(ats)}`;
+  const taxBase = yearly + ats + ps;
+  const vat = taxBase * (VAT/100);
+  const total = taxBase + vat;
+
+  $("monthlySub").textContent = `USD ${fmt(monthly)}`;
+  $("yearlySub").textContent  = `USD ${fmt(yearly)}`;
+  $("vatAmount").textContent  = `USD ${fmt(vat)}`;
+  $("totalWithVat").textContent = `USD ${fmt(total)}`;
+  $("totalWithoutVat").textContent = `USD ${fmt(taxBase)}`;
+
+  if(ps > 0){ $("implLine").style.display="block"; $("implAmount").textContent=`USD ${fmt(ps)}`; } else { $("implLine").style.display="none"; }
+
+    // ATS summary line
+  if(ba !== "None" && ats > 0){
+    $("atsLine").style.display = "block";
+    $("atsAmount").textContent = `USD ${fmt(ats)}`;
   } else {
-    $("atsYearlyLine").style.display="none";
+    $("atsLine").style.display = "none";
   }
 
-  if(ps>0){
-    $("implLine").style.display="block";
-    $("implAmount").textContent=`USD ${fmt(ps)}`;
-  } else {
-    $("implLine").style.display="none";
-  }
-
-  $("totalWithoutVat").textContent=`USD ${fmt(total)}`;
-
-  // NEW JOD CONVERSION
-  const totalJod = total * 0.71;
-  $("totalInJod").textContent = `JOD ${fmt(totalJod)}`;
-
-  const el=$("totalWithoutVat");
+// Highlight logic
+  const el = $("totalWithoutVat");
   el.classList.remove("low-total","high-total");
-  if(total<1000){ el.classList.add("low-total"); }
-  else{ el.classList.add("high-total"); }
-}function resetAll(){
-  document.querySelectorAll("input").forEach(i=>i.value="");
+  if(taxBase < 1000) el.classList.add("low-total");
+  else el.classList.add("high-total");
 
-  $("bundleZenHR").value="Value";
-  $("bundleZenATS").value="None";
-  $("atsRow").style.display="none";
-
-  ["monthlySub","yearlySub","atsYearlyAmount","totalWithoutVat","implAmount"]
-    .forEach(id=>$(id).textContent="USD 0.00");
-
-  $("totalInJod").textContent="JOD 0.00";
-
-  ["hrMinCell","peMinCell","atsMinCell","implMinCell",
-   "hrMaxCell","peMaxCell","atsMaxCell","implMaxCell"]
-    .forEach(id=>$(id).textContent="0.00");
-
-  $("implLine").style.display="none";
-  $("atsYearlyLine").style.display="none";
-
-  clearDiscounts();
-  inputsLock(true);
-  $("employees").focus();
+  // If all cleared → reset summary values
+  if(!hr && !pe && !ats && !ps){
+    $("monthlySub").textContent = "USD 0.00";
+    $("yearlySub").textContent = "USD 0.00";
+    $("implAmount").textContent = "USD 0.00";
+    $("vatAmount").textContent = "USD 0.00";
+    $("totalWithVat").textContent = "USD 0.00";
+    $("totalWithoutVat").textContent = "USD 0.00";
+  }
 }
 
-/* ===== Event Listeners ===== */
-
-$("employees").addEventListener("input",()=>{
-  const e=+$("employees").value;
-  if(e>=20){inputsLock(false);} else {inputsLock(true);}
+// =====================
+// PARTIAL RESET
+// (Only fields in "Check Your Proposal")
+// =====================
+function resetProposalFields(){
+  ["hrPrice","pePrice","atsPrice","psFees2"].forEach(id => $(id).value = "");
   clearDiscounts();
   recalc();
+}
+
+// =====================
+// FULL RESET (Reset button only)
+// =====================
+function resetAll(){ location.reload(); }
+
+// =====================
+// EVENTS
+// =====================
+
+// Changing ZenHR → RESET proposal fields
+$("bundleZenHR").addEventListener("change",()=>{
+  resetProposalFields();
 });
 
-$("employees").addEventListener("blur",()=>{
-  const e=+$("employees").value;
-  if(e && e<20){
-    Swal.fire({
-      title:'Invalid Input',
-      html:'Minimum number of employees is <b style="color:#007b83">20</b>.',
-      icon:'warning',
-      confirmButtonText:'OK',
-      confirmButtonColor:'#007b83'
-    }).then(()=>{
-      $("employees").value="";
-      $("employees").focus();
-    });
-    return;
+// Changing employees → RESET proposal fields
+$("employees").addEventListener("change",()=>{
+  resetProposalFields();
+});
+
+// Changing ZenATS → DO NOT RESET — ONLY RECALCULATE
+$("bundleZenATS").addEventListener("change",()=>{
+  const b = $("bundleZenATS").value;
+  if(b === "None"){
+    $("atsPrice").value = "";
   }
-  if(e>=20){$("hrPrice").focus();}
   recalc();
 });
 
-["bundleZenHR","bundleZenATS","employees"].forEach(id=>{
-  $(id).addEventListener("change",()=>{
-    const monthly=$("monthlySub").textContent.trim();
-    if(!monthly.includes("USD 0.00")){
-      resetAll();
-    } else {
-      recalc();
-    }
-  });
+// Unlock inputs while typing employee number
+$("employees").addEventListener("input",()=>{
+  const e = Number($("employees").value.replace(/,/g,"")) || 0;
+  inputsLock(e < 20);
+  recalc();
 });
 
-["hrPrice","pePrice","atsPrice","psFees2"].forEach(id=>{
-  $(id).addEventListener("input",recalc);
-});
-
+// Validations + blur handlers
 $("hrPrice").addEventListener("blur",()=>{
-  const e=+$("employees").value;
-  if(!e)return;
-  const r=getRange($("bundleZenHR").value,e);
-  if(!r)return;
-  const v=+$("hrPrice").value;
-  if(!v)return;
-  if(v<r.hrMin){showValidation("hrPrice","ZenHR Price",r.hrMin);}
+  const e = Number($("employees").value.replace(/,/g,"")) || 0;
+  if(!e) return;
+  const r = getRange($("bundleZenHR").value,e);
+  if(!r) return;
+  const v = +$("hrPrice").value;
+  if(!v) return;
+  if(v < r.hrMin){
+    Swal.fire({
+      title:'Invalid Value',
+      html:`<b>ZenHR Price</b> must be at least <b style="color:#007b83">USD ${fmt(r.hrMin)}</b>.`,
+      icon:'warning',
+      confirmButtonColor:'#007b83'
+    }).then(()=>{$("hrPrice").value="";$("hrPrice").focus();});
+  }
   recalc();
 });
 
 $("pePrice").addEventListener("blur",()=>{
-  const e=+$("employees").value;
-  if(!e)return;
-  const r=getRange($("bundleZenHR").value,e);
-  if(!r)return;
-  const v=+$("pePrice").value;
-  if(!v)return;
-  if(v<r.peMin){showValidation("pePrice","ZenPE Price",r.peMin);}
+  const e = Number($("employees").value.replace(/,/g,"")) || 0;
+  if(!e) return;
+  const r = getRange($("bundleZenHR").value,e);
+  if(!r) return;
+  const v = +$("pePrice").value;
+  if(!v) return;
+  if(v < r.peMin){
+    Swal.fire({
+      title:'Invalid Value',
+      html:`<b>ZenPE Price</b> must be at least <b style="color:#007b83">USD ${fmt(r.peMin)}</b>.`,
+      icon:'warning',
+      confirmButtonColor:'#007b83'
+    }).then(()=>{$("pePrice").value="";$("pePrice").focus();});
+  }
   recalc();
 });
 
 $("atsPrice").addEventListener("blur",()=>{
-  const b=$("bundleZenATS").value;
-  if(b==="None")return;
-  const a=getZenATSRange(b);
-  const v=+$("atsPrice").value;
-  if(!v)return;
-  if(v<a.min){showValidation("atsPrice","ZenATS Price",a.min);}
+  const b = $("bundleZenATS").value;
+  if(b === "None") return;
+  const a = getZenATSRange(b);
+  const v = +$("atsPrice").value;
+  if(!v) return;
+  if(v < a.min){
+    Swal.fire({
+      title:'Invalid Value',
+      html:`<b>ZenATS Price</b> must be at least <b style="color:#007b83">USD ${fmt(a.min)}</b>.`,
+      icon:'warning',
+      confirmButtonColor:'#007b83'
+    }).then(()=>{$("atsPrice").value="";$("atsPrice").focus();});
+  }
   recalc();
 });
 
+// PS Fees validation
 $("psFees2").addEventListener("blur",()=>{
-  const e=+$("employees").value;
-  if(!e)return;
-  const p=getImplementationRange(e,$("bundleZenHR").value);
-  const v=+$("psFees2").value;
-  if(!v)return;
+  const e = Number($("employees").value.replace(/,/g,"")) || 0;
+  if(!e) return;
+  const p = getImplementationRange(e,$("bundleZenHR").value);
+  const v = +$("psFees2").value;
+  if(!v) return;
 
-  if(v<p.min){
+  if(v < p.min){
     Swal.fire({
       title:'Invalid Value',
       html:`<b>Implementation / PS Fees</b> must be at least <b style="color:#007b83">USD ${fmt(p.min)}</b>.`,
       icon:'warning',
-      confirmButtonText:'Got it',
       confirmButtonColor:'#007b83'
-    }).then(()=>{
-      $("psFees2").value="";
-      $("psFees2").focus();
-    });
-  } else {
-    recalc();
+    }).then(()=>{$("psFees2").value="";$("psFees2").focus();});
   }
+  recalc();
 });
 
-$("resetBtn").addEventListener("click",resetAll);
+// Inputs recalc live
+["hrPrice","pePrice","atsPrice","psFees2"].forEach(id =>
+  $(id).addEventListener("input", recalc)
+);
 
-resetAll();
-document.getElementById("changeCountryBtn").onclick=function(){window.location="index.html";};
+// Reset button
+$("resetBtn").addEventListener("click", resetAll);
+
+// Change country button
+$("changeCountryBtn").onclick = () => { window.location = "index.html"; };
+
+// Init removed
+</script></script>
+
+<script>
+document.getElementById("country").onchange=function(){
+    const c=this.value;
+    const map={
+        "Saudi Arabia":"KSA.html",
+        "UAE":"UAE.html",
+        "Qatar":"Qatar.html",
+        "Bahrain":"Bahrain.html",
+        "Kuwait":"Kuwait.html",
+        "Oman":"Oman.html",
+        "Jordan":"Jordan.html",
+        "Iraq":"Iraq.html",
+        "Egypt":"Egypt.html"
+    };
+    window.location = map[c];
+};
 </script>
+
+
+<script>
+document.getElementById("employees").addEventListener("blur",function(){
+    const e = Number(this.value.replace(/,/g,"")) || 0;
+    if(e && e < 20){
+        Swal.fire({
+            title:'Invalid Input',
+            html:'Minimum number of employees is <b style="color:#007b83">20</b>.',
+            icon:'warning',
+            confirmButtonText:'OK',
+            confirmButtonColor:'#007b83'
+        }).then(()=>{ this.value=""; this.focus(); });
+    }
+});
+</script>
+
+
+<script>
+function formatNumInput(el){
+    let v=el.value.replace(/,/g,'');
+    if(!v||isNaN(v)) return;
+    let f=Number(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+    el.value=f;
+}
+
+['hrPrice','pePrice','atsPrice','psFees2'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('blur',()=>formatNumInput(el));
+});
+</script>
+
+
+<script>
+document.getElementById("bundleZenATS").addEventListener("change", function(){
+    const b = this.value;
+    const atsPrice = document.getElementById("atsPrice");
+    const atsRow = document.getElementById("atsRow");
+    const atsLine = document.getElementById("atsLine");
+
+    atsPrice.value = "";
+    atsRow.style.display = (b === "None") ? "none" : "";
+    atsLine.style.display = (b === "None") ? "none" : "";
+    recalc();
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const b = document.getElementById("bundleZenATS").value;
+    if(b === "None"){
+        document.getElementById("atsRow").style.display = "none";
+        document.getElementById("atsLine").style.display = "none";
+        document.getElementById("atsPrice").value = "";
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener("input", function(){
+    const ps = document.getElementById("psFees2").value.replace(/,/g,'');
+    const impl = document.getElementById("implLine");
+    if(ps && !isNaN(ps) && Number(ps) > 0){
+        impl.style.display = "block";
+    } else {
+        impl.style.display = "none";
+    }
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const emp = document.getElementById("employees");
+    if(emp){ emp.focus(); }
+});
+</script>
+
 </body>
 </html>
