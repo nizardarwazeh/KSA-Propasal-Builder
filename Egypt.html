@@ -209,18 +209,18 @@ function getImplementationRange(e,b){
 function getRange(bundle,e){
   const t = {
     Value: [
-      {minEmp:20,maxEmp:50, hrMin:2.13, hrMax:2.50, peMin:1.70, peMax:2.00},
-      {minEmp:51,maxEmp:100, hrMin:1.91, hrMax:2.25, peMin:1.49, peMax:1.75},
-      {minEmp:101,maxEmp:250, hrMin:1.70, hrMax:2.00, peMin:1.28, peMax:1.50},
-      {minEmp:251,maxEmp:500, hrMin:1.49, hrMax:1.75, peMin:1.06, peMax:1.25},
-      {minEmp:501,maxEmp:1000, hrMin:1.28, hrMax:1.50, peMin:0.85, peMax:1.00}
+      {minEmp:20,maxEmp:50, hrMin:2.35, hrMax:2.75, peMin:1.70, peMax:2.00},
+      {minEmp:51,maxEmp:100, hrMin:2.10, hrMax:2.50, peMin:1.49, peMax:1.75},
+      {minEmp:101,maxEmp:250, hrMin:1.87, hrMax:2.25, peMin:1.28, peMax:1.50},
+      {minEmp:251,maxEmp:500, hrMin:1.64, hrMax:2.00, peMin:1.06, peMax:1.25},
+      {minEmp:501,maxEmp:1000, hrMin:1.41, hrMax:1.75, peMin:0.85, peMax:1.00}
     ],
     Advanced: [
-      {minEmp:20,maxEmp:50, hrMin:2.55, hrMax:3.00, peMin:1.70, peMax:2.00},
-      {minEmp:51,maxEmp:100, hrMin:2.34, hrMax:2.75, peMin:1.49, peMax:1.75},
-      {minEmp:101,maxEmp:250, hrMin:2.13, hrMax:2.50, peMin:1.28, peMax:1.50},
-      {minEmp:251,maxEmp:500, hrMin:1.91, hrMax:2.25, peMin:1.06, peMax:1.25},
-      {minEmp:501,maxEmp:1000, hrMin:1.70, hrMax:2.00, peMin:0.85, peMax:1.00}
+      {minEmp:20,maxEmp:50, hrMin:2.81, hrMax:3.58, peMin:1.70, peMax:2.00},
+      {minEmp:51,maxEmp:100, hrMin:2.57, hrMax:3.30, peMin:1.49, peMax:1.75},
+      {minEmp:101,maxEmp:250, hrMin:2.34, hrMax:3.00, peMin:1.28, peMax:1.50},
+      {minEmp:251,maxEmp:500, hrMin:2.10, hrMax:2.75, peMin:1.06, peMax:1.25},
+      {minEmp:501,maxEmp:1000, hrMin:1.87, hrMax:2.48, peMin:0.85, peMax:1.00}
     ]
   };
   return (t[bundle] || []).find(r => e >= r.minEmp && e <= r.maxEmp) || null;
